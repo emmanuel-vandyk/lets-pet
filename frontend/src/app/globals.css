@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --default: 37.3 82.22% 82.35%;
+    --default-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem
+
+    --pure-black: 0 0% 0%;
+    --pure-white: 0 0% 100%;
+    
+    --primary-default: 36 91% 82%;
+    --primary-light: 33 86% 62%;
+    --primary-dark: 24 67% 34%;
+    
+    --secondary-default: 61 100% 42%;
+    --secondary-light: 64 60% 84%;
+    --secondary-dark: 55 95% 33%;
+    
+    --accent-default: 24 89% 51%;
+    --accent-light: 27 92% 62%;
+    --accent-dark: 22 86% 40%;
+    
+
+    --tertiary-default: 47 89% 63%;
+    --tertiary-light: 49 93% 77%;
+    --tertiary-dark: 42 91% 40%;
+    
+    --fondo-dark-default: 28.57 23.08% 17.84%;
+    --fondo-dark-medium: 25 24% 33%;
+    --fondo-dark-light: 36 31% 53%;
+    
+
+    --fondo-light-default: 39 18% 85%;
+    --fondo-light-medium: 20 13% 51%;
+    --fondo-light-dark: 20 8% 31%;
+  }
+  }
+  .dark {
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%
+
+    --background: var(--fondo-dark-light);
+    --foreground: var(--pure-white);
+    --card: var(--fondo-dark-medium);
+    --card-foreground: var(--pure-white);
+    --primary: var(--primary-dark);
+    --primary-foreground: var(--pure-white);
+    --secondary: var(--secondary-dark);
+    --secondary-foreground: var(--pure-white);
+    --accent: var(--accent-dark);
+    --accent-foreground: var(--pure-white);
+  }
+  
+  .background-image {
+    background-image: url('../app/assets/background.png');
+    background-size: cover;
+    background-position: center;
+    min-width: 100%;
+  }
+
+  .background-footer {
+    background-image: url('../app/assets/paws-footer.png');
+    background-size: cover;
+    background-position: center;
+    min-width: 100%;
+  }
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  h1 {
+    @apply text-fondodark;
+  }
+
+  button {
+    @apply bg-accent text-accent-foreground;
+  }
+}
