@@ -10,8 +10,8 @@ import {
 } from "@nextui-org/react";
 import Image from "next/image";
 import iconHeader from "@/app/assets/letspet-png.png"
-import { links } from "../layout";
 import * as React from "react";
+import { links } from "@/constants/links";
 
 export default function NavigationMenu() {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);

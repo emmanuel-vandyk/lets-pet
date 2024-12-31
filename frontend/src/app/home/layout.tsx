@@ -3,16 +3,6 @@ import Image from 'next/image';
 import iconHeader from '@/app/assets/letspet-png.png';
 import { IconFacebook, IconInstagram, IconLinkedin } from '@/app/home/components/iconProvider';
 import NavigationMenu from '@/app/home/components/navigationMenu';
-
-export const links = [
-    { name: "inicio", href: "landing" },
-    { name: "servicios", href: "servicios" },
-    { name: "sobre nosotros", href: "sobre-nosotros" },
-    { name: "como funciona?", href: "como-funciona" },
-    { name: "registrarse", href: "signup" },
-    { name: "iniciar sesion", href: "login" },
-];
-
 import { ReactNode } from 'react';
 
 export default function DashboardLayout({ children }: { children: ReactNode }): JSX.Element {
