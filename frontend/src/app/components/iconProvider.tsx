@@ -25,3 +25,12 @@ export const IconLinkedin = (props: React.SVGProps<SVGSVGElement>): JSX.Element 
         </svg>
     )
 }
+
+export const ArrowIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element => {
+    return (
+        <svg width="45" height="45" viewBox="0 0 66 66" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+            <path d="M31.9656 45.5L19.5625 33L31.9656 20.5M21.2859 33H46.4375" stroke="#F46C0F" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M63 33C63 16.4375 49.5625 3 33 3C16.4375 3 3 16.4375 3 33C3 49.5625 16.4375 63 33 63C49.5625 63 63 49.5625 63 33Z" stroke="#F46C0F" strokeWidth="5" strokeMiterlimit="10" />
+        </svg>
+    )
+}
