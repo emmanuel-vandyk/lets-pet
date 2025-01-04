@@ -1,26 +1,42 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { RegisterUserDto } from './dto/register-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(private prisma: PrismaService) { }
+  async registerUser(dto: RegisterUserDto): Promise<any> {
+    console.log('registerUser llamado con los siguientes datos:', dto);
+    
+
+    if (dto.password !== dto.passwordConfirmation) {
+      throw new BadRequestException('Passwords do not match');
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    try {
+      console.log("Creando usuario...");
+      const newUser = await this.prisma.user.create({
+        
+        data: {
+          name: dto.name,
+          lastname: dto.lastname,
+          email: dto.email,
+          password: hashedPassword,
+          terms: dto.terms,
+        },
+      });
+      console.log("Usuario creado exitosamente:", newUser);
+    } catch (error) {
+      if (error.code = 'P2002') {
+        console.log("Error creando usuario:", error);
+        throw new BadRequestException('Error creando usuario');
+      }
+      throw new InternalServerErrorException('Error creating user')
+    }
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
-  }
 }
