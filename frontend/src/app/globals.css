@@ -17,7 +17,8 @@
     --default-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
+    --accent: 24.37, 91.24%, 50.78%;
+    --accent-dark: 16.9, 84.47%, 40.39%;
     --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -42,9 +43,9 @@
     --secondary-light: 64 60% 84%;
     --secondary-dark: 55 95% 33%;
     
-    --accent-default: 24 89% 51%;
+    --accent-default: hsl(24.37, 91.24%, 50.78%);
     --accent-light: 27 92% 62%;
-    --accent-dark: 22 86% 40%;
+    --accent-dark: 16.9, 84.47%, 40.39%;
     
 
     --tertiary-default: 47 89% 63%;
@@ -84,24 +85,24 @@
     --accent: var(--accent-dark);
     --accent-foreground: var(--pure-white);
   }
-  
+
   .background-image {
     background-image: url('../app/assets/background.png');
     background-size: cover;
     background-position: center;
-    min-width: 100%;
+    background-repeat: no-repeat;
   }
 
   .background-footer {
     background-image: url('../app/assets/paws-footer.png');
     background-size: cover;
     background-position: center;
-    min-width: 100%;
   }
+
 
 @layer base {
   body {
-    @apply bg-background text-foreground;
+    @apply grid max-w-layout bg-background text-foreground h-svh;
   }
 
   h1 {
@@ -110,5 +111,9 @@
 
   button {
     @apply bg-accent text-accent-foreground;
+  }
+
+  input {
+    @apply sm:w-64 w-full
   }
 }

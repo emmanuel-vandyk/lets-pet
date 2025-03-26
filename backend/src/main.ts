@@ -2,10 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as morgan from 'morgan';
 import { CORS } from './constants';
-import { env } from 'process';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { logger: ['log', 'error', 'warn', 'debug', 'verbose'] });
+
+  app.useGlobalPipes(new ValidationPipe(
+    { whitelist: true }
+  ))
 
   app.use(morgan('dev'));
 
