@@ -1,10 +1,9 @@
-import React from 'react';
-export const Profile = (): JSX.Element => {
-    return (
-        <div>
-            <h1>My perfil</h1>
-        </div>
-    )
-}
+import React from "react";
 
-export default Profile;
+export default function Profile(): JSX.Element {
+  return (
+    <div>
+      <h1>My perfil</h1>
+    </div>
+  );
+}
