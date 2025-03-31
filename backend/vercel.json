@@ -2,7 +2,7 @@
   "version": 2,
   "outputDirectory": "backend/dist",
   "buildCommand": "cd backend && npm run vercel-build",
-  "installCommand": "cd backend && npm install",
+  "installCommand": "cd backend && npm install --legacy-peer-deps",
   "builds": [
     {
       "src": "src/main.ts",
