@@ -1,18 +1,24 @@
-import axios from "axios"
+import axios from "axios";
 
-const BACKEND_URL_PROD = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-
-if (!BACKEND_URL_PROD) {
-    throw new Error('La variable de entorno no está definida');
-} 
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  "https://letspet-server.vercel.app/api";
 
 const api = axios.create({
-    baseURL: BACKEND_URL_PROD,
-    timeout: 10000,
-    headers: {
-        'Content-Type': 'application/json',
-    },
+  baseURL: BACKEND_URL,
+  timeout: 10000,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
+
+// Interceptor para manejar errores
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error("API Error:", error);
+    return Promise.reject(error);
+  }
+);
 
 export default api;

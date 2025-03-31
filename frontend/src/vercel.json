@@ -1,8 +1,0 @@
-{
-    "rewrites": [
-      { "source": "/", "destination": "/home/landing" }
-    ],
-    "cleanUrls": true,
-    "trailingSlash": false
-  }
-  

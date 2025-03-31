@@ -4,7 +4,8 @@ const nextConfig: NextConfig = {
   /* config options here */
   trailingSlash: false,
   images: {
-    unoptimized: true,
+    domains: ["letspet-server.vercel.app"],
+    unoptimized: process.env.NODE_ENV === "development",
   },
 };
 
