@@ -6,10 +6,14 @@
   "builds": [
     {
       "src": "backend/dist/main.js",
-      "use": "@vercel/node"
+      "use": "@vercel/nodejs"
     }
   ],
   "routes": [
+    {
+      "src": "/api/docs/(.*)",
+      "dest": "backend/dist/main.js"
+    },
     {
       "src": "/api/(.*)",
       "dest": "backend/dist/main.js",
