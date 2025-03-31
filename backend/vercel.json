@@ -5,29 +5,22 @@
   "installCommand": "cd backend && npm install",
   "builds": [
     {
-      "src": "backend/dist/main.js",
-      "use": "@vercel/nodejs"
+      "src": "src/main.ts",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/api/docs/(.*)",
-      "dest": "backend/dist/main.js"
+      "dest": "src/main.ts"
     },
     {
       "src": "/api/(.*)",
-      "dest": "backend/dist/main.js",
-      "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-      "headers": {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Authorization",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-      }
+      "dest": "src/main.ts"
     },
     {
       "src": "/(.*)",
-      "dest": "backend/dist/main.js",
-      "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+      "dest": "src/main.ts"
     }
   ],
   "env": {
