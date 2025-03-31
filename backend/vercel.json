@@ -28,7 +28,9 @@
   },
   "functions": {
     "src/main.ts": {
-      "includeFiles": "./**"
+      "includeFiles": "./**",
+      "memory": 1024,
+      "maxDuration": 10
     }
   }
 }

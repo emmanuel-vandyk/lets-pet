@@ -14,7 +14,12 @@ async function bootstrap() {
   });
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-  app.use(morgan('dev'));
+
+  // En entorno de producción, desactivamos morgan para evitar logs excesivos
+  if (process.env.NODE_ENV !== 'production') {
+    app.use(morgan('dev'));
+  }
+
   app.enableCors(CORS);
 
   // Configuramos el prefijo global ANTES de configurar Swagger
@@ -40,9 +45,16 @@ async function bootstrap() {
     next();
   });
 
-  const port = process.env.PORT || 8080;
-  await app.listen(port);
-  logger.log(`Server is running on port ${port}`);
-  logger.log(`Swagger is running on http://localhost:${port}/api/docs`);
+  // Solo en entorno de desarrollo, necesitamos escuchar en un puerto
+  if (process.env.NODE_ENV !== 'production') {
+    const port = process.env.PORT || 8080;
+    await app.listen(port);
+    logger.log(`Server is running on port ${port}`);
+    logger.log(`Swagger is running on http://localhost:${port}/api/docs`);
+  }
+
+  return app;
 }
-bootstrap();
+
+// Para entornos serverless, exportamos la aplicación
+export default bootstrap();
