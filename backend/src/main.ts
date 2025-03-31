@@ -14,6 +14,15 @@ async function bootstrap() {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
 
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.use(morgan('dev'));
+  app.enableCors(CORS);
+
+  // Configuramos el prefijo global ANTES de configurar Swagger
+  app.setGlobalPrefix('api', {
+    exclude: ['/', 'docs'],
+  });
+
   // Configuración de Swagger
   const config = new DocumentBuilder()
     .setTitle("Let's Pet API")
@@ -23,26 +32,18 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  // Usamos una ruta más específica para la documentación
+  SwaggerModule.setup('api/docs', app, document);
 
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-
-  app.use(morgan('dev'));
-
+  // Middleware para marcar la ruta de Swagger como pública
   app.use('/api/docs', (req: Request, res: Response, next: NextFunction) => {
     req['isPublic'] = true;
     next();
   });
 
-  app.enableCors(CORS);
-
-  app.setGlobalPrefix('api', {
-    exclude: ['/'],
-  });
-
   const port = process.env.PORT || 8080;
   await app.listen(port);
   logger.log(`Server is running on port ${port}`);
-  logger.log(`Swagger is running on http://localhost:${port}/api`);
+  logger.log(`Swagger is running on http://localhost:${port}/api/docs`);
 }
 bootstrap();
