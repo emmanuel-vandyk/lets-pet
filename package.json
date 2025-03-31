@@ -2,18 +2,8 @@
   "name": "lets-pet",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "frontend",
-    "backend"
-  ],
   "scripts": {
-    "start:frontend": "cd frontend && npm run dev",
-    "start:backend": "cd backend && npm run start:dev",
-    "build:frontend": "cd frontend && npm run build",
-    "build:backend": "cd backend && npm run build",
-    "vercel-build": "cd frontend && npm install --legacy-peer-deps && npm run build"
+    "build": "cd frontend && npm install && npm run build"
   },
-  "dependencies": {
-    "next": "15.1.2"
-  }
+  "dependencies": {}
 }
