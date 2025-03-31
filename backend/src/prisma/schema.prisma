@@ -1,0 +1,22 @@
+// Placeholder para asegurar que Prisma pueda encontrar el esquema
+// Este archivo debe ser reemplazado con tu esquema real de Prisma
+// Ejemplo mínimo:
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  lastName  String
+  email     String   @unique
+  password  String
+  confirmedPassword String
+  terms Boolean @default(false)
+}

@@ -1,16 +1,25 @@
-import { Body, Controller, HttpCode, HttpStatus, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { Tokens } from './types';
-import { GetCurrentUser, GetCurrentUserId, Public } from 'src/common/decorators';
-import { RtGuard } from 'src/common/guards';
-import { RequestResetPasswordDto } from 'src/email/dto/request-reset-password.dto';
-import { ResetPasswordDto } from 'src/email/dto/reset-password.dto';
+import { GetCurrentUser, GetCurrentUserId, Public } from '../common/decorators';
+import { RtGuard } from '../common/guards';
+import { RequestResetPasswordDto } from '../email/dto/request-reset-password.dto';
+import { ResetPasswordDto } from '../email/dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
   @Public()
   @Post('register')
@@ -38,21 +47,28 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   refreshTokens(
     @GetCurrentUserId() userId: string,
-    @GetCurrentUser('refreshToken') refreshToken: string) {
+    @GetCurrentUser('refreshToken') refreshToken: string,
+  ) {
     return this.authService.refreshTokens(userId, refreshToken);
   }
 
   @Public()
   @Patch('request-reset-password')
-  async requestResetPassword(@Body() dto: RequestResetPasswordDto): Promise<{ message: string }> {
+  async requestResetPassword(
+    @Body() dto: RequestResetPasswordDto,
+  ): Promise<{ message: string }> {
     await this.authService.requestResetPassword(dto);
-    return { message: 'Se envió un correo para restablecer tu contraseña, revisa tu bandeja de entrada. O revisa tu bandeja de spam.' }
+    return {
+      message:
+        'Se envió un correo para restablecer tu contraseña, revisa tu bandeja de entrada. O revisa tu bandeja de spam.',
+    };
   }
 
   @Public()
   @Patch('reset-password')
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<void> {
+  async resetPassword(
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ): Promise<void> {
     return this.authService.resetPassword(resetPasswordDto);
   }
 }
-
