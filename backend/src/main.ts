@@ -15,11 +15,11 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
-  // En entorno de producción, desactivamos morgan para evitar logs excesivos
+  /*   // En entorno de producción, desactivamos morgan para evitar logs excesivos
   if (process.env.NODE_ENV !== 'production') {
     app.use(morgan('dev'));
   }
-
+ */
   app.enableCors(CORS);
 
   // Configuramos el prefijo global ANTES de configurar Swagger
