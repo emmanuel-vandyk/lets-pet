@@ -238,7 +238,7 @@ export class AuthService {
           hashedRt: null,
         },
       });
-    } catch (error) {
+    } catch (_) {
       throw new UnauthorizedException(AuthErrors.INVALID_OR_EXPIRED_TOKEN);
     }
   }

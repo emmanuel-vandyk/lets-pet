@@ -6,4 +6,4 @@ import { ProtectedService } from './protected.service';
   controllers: [ProtectedController],
   providers: [ProtectedService],
 })
-export class ProtectedModule { }
+export class ProtectedModule {}
