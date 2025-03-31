@@ -3,8 +3,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as morgan from 'morgan';
 import { CORS } from './constants';
-import { ValidationPipe } from '@nestjs/common';
-import { Logger } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 
 const logger = new Logger('Main');
