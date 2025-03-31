@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "buildCommand": "cd backend && npm run vercel-build",
+  "installCommand": "cd backend && npm install",
+  "outputDirectory": "backend/dist",
+  "builds": [
+    {
+      "src": "backend/dist/main.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/docs/(.*)",
+      "dest": "backend/dist/main.js"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "backend/dist/main.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "backend/dist/main.js"
+    }
+  ]
+}
