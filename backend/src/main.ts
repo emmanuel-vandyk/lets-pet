@@ -26,7 +26,7 @@ async function bootstrap() {
   // Configuración de Swagger
   const config = new DocumentBuilder()
     .setTitle("Let's Pet API")
-    .setDescription("API para la aplicación Let's Pet")
+    .setDescription("API para la aplicación Let's Pet Services")
     .setVersion('1.0.0')
     .addBearerAuth()
     .build();
