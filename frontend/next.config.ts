@@ -4,7 +4,14 @@ const nextConfig: NextConfig = {
   /* config options here */
   trailingSlash: false,
   images: {
-    domains: ["letspet-server.vercel.app"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "letspet-server.vercel.app",
+        port: "",
+        pathname: "/**",
+      },
+    ],
     unoptimized: process.env.NODE_ENV === "development",
   },
 };

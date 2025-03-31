@@ -2,9 +2,6 @@
   "rewrites": [{ "source": "/", "destination": "/home/landing" }],
   "cleanUrls": true,
   "trailingSlash": false,
-  "images": {
-    "domains": ["letspet-server.vercel.app"]
-  },
   "env": {
     "NEXT_PUBLIC_BACKEND_URL": "https://letspet-server.vercel.app/api"
   }
