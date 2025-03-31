@@ -1,8 +1,5 @@
 {
   "version": 2,
-  "outputDirectory": "backend/dist",
-  "buildCommand": "cd backend && npm run vercel-build",
-  "installCommand": "cd backend && npm install --legacy-peer-deps",
   "builds": [
     {
       "src": "src/main.ts",
@@ -11,26 +8,11 @@
   ],
   "routes": [
     {
-      "src": "/api/docs/(.*)",
-      "dest": "src/main.ts"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "src/main.ts"
-    },
-    {
       "src": "/(.*)",
       "dest": "src/main.ts"
     }
   ],
   "env": {
     "NODE_ENV": "production"
-  },
-  "functions": {
-    "src/main.ts": {
-      "includeFiles": "./**",
-      "memory": 1024,
-      "maxDuration": 10
-    }
   }
 }

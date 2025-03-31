@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import morgan from 'morgan';
+import * as morgan from 'morgan';
 import { CORS } from './constants';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
