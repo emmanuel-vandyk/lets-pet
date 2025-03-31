@@ -1,25 +1,33 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import * as morgan from 'morgan';
+/* import * as morgan from 'morgan'; */
 import { CORS } from './constants';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 
 const logger = new Logger('Main');
 
+// Para entornos serverless, es útil guardar y reutilizar la instancia
+let app;
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  // Si ya tenemos una instancia de la aplicación, la reutilizamos
+  if (app) {
+    return app;
+  }
+
+  app = await NestFactory.create(AppModule, {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
-  /*   // En entorno de producción, desactivamos morgan para evitar logs excesivos
+  /*   // Desactivamos morgan en producción para evitar logs excesivos
   if (process.env.NODE_ENV !== 'production') {
     app.use(morgan('dev'));
-  }
- */
+  } */
+
   app.enableCors(CORS);
 
   // Configuramos el prefijo global ANTES de configurar Swagger
@@ -51,10 +59,12 @@ async function bootstrap() {
     await app.listen(port);
     logger.log(`Server is running on port ${port}`);
     logger.log(`Swagger is running on http://localhost:${port}/api/docs`);
+  } else {
+    await app.init();
   }
 
   return app;
 }
 
 // Para entornos serverless, exportamos la aplicación
-export default bootstrap();
+export default bootstrap;
