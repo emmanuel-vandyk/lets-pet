@@ -10,20 +10,27 @@ import { UsersModule } from './users/users.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AtGuard } from './common/guards';
 import { EmailModule } from './email/email.module';
-
+import { AppController } from './app.controller';
 @Module({
-  imports: [PrismaModule,
+  imports: [
+    PrismaModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    AuthModule, UsersModule, JwtModule, ProtectedModule, EmailModule],
-  controllers: [AuthController],
-  providers: [AuthService, 
+    AuthModule,
+    UsersModule,
+    JwtModule,
+    ProtectedModule,
+    EmailModule,
+  ],
+  controllers: [AppController, AuthController],
+  providers: [
+    AuthService,
     {
       provide: APP_GUARD,
       useClass: AtGuard,
-    }
+    },
   ],
-  exports: [AuthService]
+  exports: [AuthService],
 })
-export class AppModule { }
+export class AppModule {}
