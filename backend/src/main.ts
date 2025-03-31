@@ -66,5 +66,11 @@ async function bootstrap() {
   return app;
 }
 
-// Para entornos serverless, exportamos la aplicación
+// Para entornos serverless, exportamos la aplicación inicializada
 export default bootstrap;
+
+// Exportamos un handler específico para Vercel
+export const handler = async (req, res) => {
+  const server = await bootstrap();
+  return server.getHttpAdapter().getInstance()(req, res);
+};

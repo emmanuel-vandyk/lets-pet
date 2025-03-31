@@ -4,9 +4,29 @@
     {
       "src": "src/main.ts",
       "use": "@vercel/node"
+    },
+    {
+      "src": "src/test-endpoint.ts",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
+    {
+      "src": "/test",
+      "dest": "src/test-endpoint.ts"
+    },
+    {
+      "src": "/api/docs/(.*)",
+      "dest": "src/main.ts"
+    },
+    {
+      "src": "/api/auth/(.*)",
+      "dest": "src/main.ts"
+    },
+    {
+      "src": "/api/users/(.*)",
+      "dest": "src/main.ts"
+    },
     {
       "src": "/api/(.*)",
       "dest": "src/main.ts"
@@ -18,5 +38,15 @@
   ],
   "env": {
     "NODE_ENV": "production"
+  },
+  "functions": {
+    "src/main.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "src/test-endpoint.ts": {
+      "memory": 512,
+      "maxDuration": 5
+    }
   }
 }
