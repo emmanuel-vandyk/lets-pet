@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "letspet-server.vercel.app",
+        hostname: "lets-pet-backend.vercel.app",
         port: "",
         pathname: "/**",
       },

@@ -3,6 +3,6 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "env": {
-    "NEXT_PUBLIC_BACKEND_URL": "https://letspet-server.vercel.app/api"
+    "NEXT_PUBLIC_BACKEND_URL": "https://lets-pet-backend.vercel.app/api"
   }
 }
