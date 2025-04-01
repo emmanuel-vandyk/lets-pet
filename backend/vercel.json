@@ -8,12 +8,28 @@
     {
       "src": "src/test-endpoint.ts",
       "use": "@vercel/node"
+    },
+    {
+      "src": "src/debug-endpoint.ts",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/test",
       "dest": "src/test-endpoint.ts"
+    },
+    {
+      "src": "/test/(.*)",
+      "dest": "src/test-endpoint.ts"
+    },
+    {
+      "src": "/debug",
+      "dest": "src/debug-endpoint.ts"
+    },
+    {
+      "src": "/debug/(.*)",
+      "dest": "src/debug-endpoint.ts"
     },
     {
       "src": "/api/docs/(.*)",
@@ -41,10 +57,16 @@
   },
   "functions": {
     "src/main.ts": {
-      "memory": 1024
+      "memory": 1024,
+      "maxDuration": 60
     },
     "src/test-endpoint.ts": {
-      "memory": 512
+      "memory": 512,
+      "maxDuration": 10
+    },
+    "src/debug-endpoint.ts": {
+      "memory": 512,
+      "maxDuration": 10
     }
   }
 }
