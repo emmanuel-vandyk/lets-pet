@@ -1,8 +1,12 @@
-.env
+# Archivos grandes o innecesarios
 node_modules
-npm-debug.log
 .git
 .gitignore
 .DS_Store
 test
-README.md 
+npm-debug.log
+README.md
+
+# Archivos sensibles
+*.log
+.env.local 
