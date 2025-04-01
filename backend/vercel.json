@@ -3,10 +3,6 @@
   "buildCommand": "npm run vercel-build",
   "routes": [
     {
-      "src": "/api/db-check",
-      "dest": "src/db-check.js"
-    },
-    {
       "src": "/(.*)",
       "dest": "dist/main.js",
       "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"]
@@ -19,10 +15,6 @@
       "config": {
         "maxLambdaSize": "50mb"
       }
-    },
-    {
-      "src": "src/db-check.js",
-      "use": "@vercel/node"
     }
   ],
   "env": {
