@@ -155,11 +155,8 @@ async function bootstrap() {
   }
 }
 
-// Para entornos serverless, exportamos la aplicación
-export default bootstrap;
-
-// Handler específico para Vercel
-export const handler = async (req, res) => {
+// Para entornos serverless (Vercel), exportamos el handler
+module.exports = async (req, res) => {
   try {
     forceLog(`Vercel handler invoked: ${req.method} ${req.url}`);
 
