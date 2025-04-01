@@ -41,12 +41,10 @@
   },
   "functions": {
     "src/main.ts": {
-      "memory": 1024,
-      "maxDuration": 10
+      "memory": 1024
     },
     "src/test-endpoint.ts": {
-      "memory": 512,
-      "maxDuration": 5
+      "memory": 512
     }
   }
 }
