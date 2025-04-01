@@ -27,16 +27,21 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   }
 
   async onModuleInit() {
+    if (process.env.NODE_ENV === 'production') {
+      // En producción simplemente registramos que el servicio se ha iniciado
+      // No intentamos conectar inmediatamente para evitar bloquear la inicialización
+      this.logger.log(
+        'Prisma service initialized in production mode - deferring connection',
+      );
+      return;
+    }
+
     try {
       await this.connectWithRetry();
     } catch (error) {
       this.logger.error(`Failed to connect to database: ${error.message}`);
-      if (process.env.NODE_ENV === 'production') {
-        // En producción, no queremos que el servicio falle por completo
-        this.logger.warn('Continuing despite database connection failure');
-      } else {
-        throw error;
-      }
+      // Solo en desarrollo lanzamos el error para forzar una corrección inmediata
+      throw error;
     }
   }
 
@@ -75,7 +80,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 
         if (errorMessage.includes('Address not in tenant allow_list')) {
           this.logger.error(
-            `IP access error: Vercel's IP address is not allowed to access Supabase. Please add the Vercel IP addresses to the allow list in Supabase dashboard.`,
+            `IP access error: Vercel's IP address is not allowed to access Supabase. You may need to configure Supabase to allow all connections.`,
           );
         }
 
@@ -90,6 +95,25 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
           throw error;
         }
       }
+    }
+  }
+
+  // Método público para verificar la conexión a la base de datos
+  async checkConnection() {
+    try {
+      if (!this.isConnected) {
+        await this.connectWithRetry();
+      }
+
+      // Realizar una consulta simple para verificar la conexión
+      await this.$queryRaw`SELECT 1 as connected`;
+      return { connected: true, timestamp: new Date().toISOString() };
+    } catch (error) {
+      return {
+        connected: false,
+        error: error.message,
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 

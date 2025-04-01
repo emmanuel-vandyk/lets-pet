@@ -19,12 +19,12 @@ async function bootstrap() {
     }
 
     logger.log('Creating new application instance');
+
     // Añadir timeout más largo para evitar problemas de conexión
     app = await NestFactory.create(AppModule, {
       logger: ['log', 'error', 'warn', 'debug', 'verbose'],
-      // Aumentar el timeout para evitar problemas de conexión
-      bodyParser: true,
-      abortOnError: false,
+      // En producción, no falla si hay problemas con otros servicios
+      abortOnError: process.env.NODE_ENV !== 'production',
     });
 
     app.useGlobalPipes(
@@ -35,20 +35,16 @@ async function bootstrap() {
       }),
     );
 
-    // Configurar CORS para permitir solicitudes desde cualquier origen en desarrollo
-    if (process.env.NODE_ENV !== 'production') {
-      app.enableCors({
-        origin: '*',
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-        credentials: true,
-      });
-    } else {
-      app.enableCors(CORS);
-    }
+    // Configurar CORS
+    app.enableCors({
+      origin: '*',
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+      credentials: true,
+    });
 
     // Configuramos el prefijo global
     app.setGlobalPrefix('api', {
-      exclude: ['/', 'docs'],
+      exclude: ['/', 'docs', 'health'],
     });
 
     // Configuración de Swagger
@@ -69,7 +65,7 @@ async function bootstrap() {
       next();
     });
 
-    // Middleware para manejar errores
+    // Middleware para capturar errores
     app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
       logger.error(`Error handling request: ${error.message}`);
       logger.error(error.stack);
@@ -102,12 +98,33 @@ async function bootstrap() {
     logger.error(`Failed to start application: ${error.message}`);
     logger.error(error.stack);
 
-    // En producción, intentamos continuar a pesar de los errores
-    if (process.env.NODE_ENV === 'production' && app) {
-      logger.warn('Continuing despite initialization error');
+    // En producción, tenemos que continuar incluso con errores
+    // porque Vercel espera que el handler exporte una aplicación
+    if (process.env.NODE_ENV === 'production') {
+      logger.warn('CRITICAL WARNING: Application running in degraded mode');
+
+      // Vercel necesita alguna respuesta, así que creamos una mini app de Express
+      if (!app) {
+        const express = require('express');
+        const expressApp = express();
+
+        // Respuesta básica para todas las rutas
+        expressApp.all('*', (req, res) => {
+          res.status(500).json({
+            error: 'Application failed to initialize properly',
+            message:
+              'The server is currently unavailable. Please try again later.',
+            timestamp: new Date().toISOString(),
+          });
+        });
+
+        return { getHttpAdapter: () => ({ getInstance: () => expressApp }) };
+      }
+
       return app;
     }
 
+    // En desarrollo, queremos que falle para poder arreglarlo
     throw error;
   }
 }
@@ -115,36 +132,22 @@ async function bootstrap() {
 // Para entornos serverless, exportamos la aplicación
 export default bootstrap;
 
-// Handler específico para Vercel con mejor manejo de timeout
+// Handler específico para Vercel
 export const handler = async (req, res) => {
   try {
-    // Establecer un timeout para evitar que las funciones se queden bloqueadas
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => {
-        reject(new Error('Handler timeout after 25 seconds'));
-      }, 25000); // 25 segundos es suficiente para la mayoría de las operaciones
-    });
-
-    // Race entre la ejecución normal y el timeout
-    await Promise.race([
-      (async () => {
-        const server = await bootstrap();
-        const expressInstance = server.getHttpAdapter().getInstance();
-        return expressInstance(req, res);
-      })(),
-      timeoutPromise,
-    ]);
+    const server = await bootstrap();
+    const expressInstance = server.getHttpAdapter().getInstance();
+    return expressInstance(req, res);
   } catch (error) {
     logger.error(`Handler error: ${error.message}`);
-    logger.error(error.stack);
 
+    // Si todo falla, al menos devolvemos una respuesta al cliente
     if (!res.headersSent) {
       res.status(500).json({
         error: 'Internal Server Error',
         message:
-          process.env.NODE_ENV !== 'production'
-            ? error.message
-            : 'An unexpected error occurred',
+          'The server encountered an unexpected condition that prevented it from fulfilling the request.',
+        timestamp: new Date().toISOString(),
       });
     }
   }

@@ -1,7 +1,17 @@
 {
   "version": 2,
   "buildCommand": "npm run vercel-build",
-  "outputDirectory": "dist",
+  "routes": [
+    {
+      "src": "/api/db-check",
+      "dest": "src/db-check.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "dist/main.js",
+      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"]
+    }
+  ],
   "builds": [
     {
       "src": "dist/main.js",
@@ -12,36 +22,10 @@
     },
     {
       "src": "src/db-check.js",
-      "use": "@vercel/node",
-      "config": {
-        "maxLambdaSize": "50mb"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/db-check",
-      "dest": "src/db-check.js",
-      "methods": ["GET"]
-    },
-    {
-      "src": "/(.*)",
-      "dest": "dist/main.js",
-      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"]
+      "use": "@vercel/node"
     }
   ],
   "env": {
     "NODE_ENV": "production"
-  },
-  "regions": ["iad1"],
-  "functions": {
-    "dist/main.js": {
-      "memory": 1024,
-      "maxDuration": 60
-    },
-    "src/db-check.js": {
-      "memory": 1024,
-      "maxDuration": 30
-    }
   }
 }
