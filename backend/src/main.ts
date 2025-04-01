@@ -1,15 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-/* import * as morgan from 'morgan'; */
 import { CORS } from './constants';
-import { ValidationPipe, Logger, INestApplication } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 
 const logger = new Logger('Main');
 
 // Para entornos serverless, es útil guardar y reutilizar la instancia
-let app: INestApplication;
+let app;
 
 async function bootstrap() {
   try {
@@ -22,29 +21,18 @@ async function bootstrap() {
     logger.log('Creating new application instance');
     app = await NestFactory.create(AppModule, {
       logger: ['log', 'error', 'warn', 'debug', 'verbose'],
-      // Aumentar el timeout para las peticiones
-      bodyParser: true,
     });
 
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
         transform: true,
-        // Configuración adicional para manejar mejor los errores
-        forbidUnknownValues: true,
-        disableErrorMessages: process.env.NODE_ENV === 'production',
       }),
     );
 
-    /*   // Desactivamos morgan en producción para evitar logs excesivos
-    if (process.env.NODE_ENV !== 'production') {
-      app.use(morgan('dev'));
-    } */
-
-    // Configuración de CORS
     app.enableCors(CORS);
 
-    // Configuramos el prefijo global ANTES de configurar Swagger
+    // Configuramos el prefijo global
     app.setGlobalPrefix('api', {
       exclude: ['/', 'docs'],
     });
@@ -67,25 +55,6 @@ async function bootstrap() {
       next();
     });
 
-    // Middleware para registro de peticiones
-    app.use((req: Request, res: Response, next: NextFunction) => {
-      logger.debug(`[${req.method}] ${req.url}`);
-      next();
-    });
-
-    // Middleware para manejar errores globales
-    app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-      logger.error(`Error handling request: ${err.message}`);
-      logger.error(err.stack);
-
-      if (!res.headersSent) {
-        res.status(500).json({
-          statusCode: 500,
-          message: 'Internal server error',
-        });
-      }
-    });
-
     // Solo en entorno de desarrollo, necesitamos escuchar en un puerto
     if (process.env.NODE_ENV !== 'production') {
       const port = process.env.PORT || 8080;
@@ -94,38 +63,25 @@ async function bootstrap() {
       logger.log(`Swagger is running on http://localhost:${port}/api/docs`);
     } else {
       await app.init();
-      logger.log('Application initialized in serverless mode');
     }
 
     return app;
   } catch (error) {
     logger.error(`Failed to start application: ${error.message}`);
-    logger.error(error.stack);
     throw error;
   }
 }
 
-// Para entornos serverless, exportamos la aplicación inicializada
+// Para entornos serverless, exportamos la aplicación
 export default bootstrap;
 
-// Exportamos un handler específico para Vercel
+// Handler específico para Vercel
 export const handler = async (req, res) => {
   try {
-    logger.log(`Handling request: ${req.method} ${req.url}`);
     const server = await bootstrap();
-    return server.getHttpAdapter().getInstance()(req, res);
+    const expressInstance = server.getHttpAdapter().getInstance();
+    return expressInstance(req, res);
   } catch (error) {
-    logger.error(`Error in handler: ${error.message}`);
-    logger.error(error.stack);
-
-    // Asegurarse de que devolvemos una respuesta en caso de error
-    if (!res.headersSent) {
-      res.status(500).json({
-        statusCode: 500,
-        message: 'Internal server error',
-        error:
-          process.env.NODE_ENV !== 'production' ? error.message : undefined,
-      });
-    }
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
