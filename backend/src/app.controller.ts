@@ -1,11 +1,23 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Logger } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from './common/decorators';
 import { PrismaService } from './prisma/prisma.service';
 
+// Función para forzar logs visibles en Vercel
+function forceLog(message: string, obj?: any) {
+  // Log directo a la consola (aparecerá en Vercel)
+  if (obj) {
+    console.log(`[VERCEL-DB-CHECK] ${message}`, JSON.stringify(obj));
+  } else {
+    console.log(`[VERCEL-DB-CHECK] ${message}`);
+  }
+}
+
 @ApiTags('App')
 @Controller()
 export class AppController {
+  private readonly logger = new Logger(AppController.name);
+
   constructor(private readonly prismaService: PrismaService) {}
 
   @Public()
@@ -17,6 +29,7 @@ export class AppController {
     type: Object,
   })
   getWelcome() {
+    forceLog('Welcome endpoint called');
     return {
       name: "Let's Pet API",
       version: '1.0.0',
@@ -42,8 +55,11 @@ export class AppController {
     type: Object,
   })
   async getHealth() {
+    forceLog('Health check endpoint called');
+
     // Obtener el estado de la conexión a la base de datos
     const dbStatus = await this.prismaService.checkConnection();
+    forceLog('Database check result:', dbStatus);
 
     // Información sobre el entorno
     const environment = {
@@ -51,6 +67,7 @@ export class AppController {
       vercelEnv: process.env.VERCEL_ENV,
       vercelRegion: process.env.VERCEL_REGION,
     };
+    forceLog('Environment info:', environment);
 
     // Información sobre la memoria
     const memoryUsage = process.memoryUsage();
@@ -60,8 +77,9 @@ export class AppController {
       heapUsed: `${Math.round(memoryUsage.heapUsed / 1024 / 1024)} MB`,
       external: `${Math.round(memoryUsage.external / 1024 / 1024)} MB`,
     };
+    forceLog('Memory usage:', memory);
 
-    return {
+    const response = {
       status: 'online',
       uptime: process.uptime(),
       timestamp: new Date().toISOString(),
@@ -69,6 +87,9 @@ export class AppController {
       environment,
       memory,
     };
+
+    forceLog('Sending health response:', response);
+    return response;
   }
 
   @Public()
@@ -81,34 +102,59 @@ export class AppController {
   })
   async getDatabaseDiagnostics() {
     const startTime = Date.now();
-    console.log('[DB-CHECK] Starting database diagnostics');
+    forceLog('=== INICIANDO DIAGNÓSTICO DE BASE DE DATOS ===');
+    forceLog(`Timestamp: ${new Date().toISOString()}`);
 
     try {
+      // Mostrar todas las variables de entorno (sin credenciales)
+      forceLog('Variables de entorno disponibles:');
+      const envVars = Object.keys(process.env)
+        .filter(
+          (key) =>
+            !key.includes('KEY') &&
+            !key.includes('SECRET') &&
+            !key.includes('TOKEN') &&
+            !key.includes('PASSWORD'),
+        )
+        .reduce((obj, key) => {
+          obj[key] = process.env[key] ? 'CONFIGURADO' : 'NO CONFIGURADO';
+          return obj;
+        }, {});
+      forceLog('Environment variables:', envVars);
+
       // Extraer información sobre la URL de la base de datos (sin mostrar credenciales)
       const dbUrlParts = process.env.DATABASE_URL?.split('@') || [];
       let dbHost = 'unknown';
-      if (dbUrlParts.length > 1) {
-        dbHost = dbUrlParts[1].split('/')[0];
+      let dbProtocol = 'unknown';
+
+      if (process.env.DATABASE_URL) {
+        if (dbUrlParts.length > 1) {
+          dbHost = dbUrlParts[1].split('/')[0];
+        }
+
+        const protocolParts = process.env.DATABASE_URL.split('://');
+        if (protocolParts.length > 1) {
+          dbProtocol = protocolParts[0];
+        }
+
+        forceLog(`Database host: ${dbHost}`);
+        forceLog(`Database protocol: ${dbProtocol}`);
+      } else {
+        forceLog('DATABASE_URL no está configurada');
       }
 
-      console.log(`[DB-CHECK] Database host: ${dbHost}`);
-      console.log(
-        `[DB-CHECK] Database URL is configured: ${!!process.env.DATABASE_URL}`,
-      );
-      console.log(
-        `[DB-CHECK] Direct URL is configured: ${!!process.env.DIRECT_URL}`,
-      );
+      forceLog(`DIRECT_URL configurada: ${!!process.env.DIRECT_URL}`);
 
       // Intentar conectar a la base de datos
+      forceLog('Intentando conectar a la base de datos...');
       const connectionResult = await this.prismaService.checkConnection();
-      console.log(
-        `[DB-CHECK] Connection result: ${JSON.stringify(connectionResult)}`,
-      );
+      forceLog('Resultado de la conexión:', connectionResult);
 
       // Información adicional sobre la base de datos
       let dbInfo = null;
       try {
         if (connectionResult.connected) {
+          forceLog('Conexión exitosa, obteniendo información adicional...');
           // Obtener versión de PostgreSQL
           const versionResult = await this.prismaService
             .$queryRaw`SELECT version()`;
@@ -116,16 +162,19 @@ export class AppController {
             version: versionResult[0].version,
             isSupabase: dbHost.includes('supabase'),
           };
-          console.log(`[DB-CHECK] Database info: ${JSON.stringify(dbInfo)}`);
+          forceLog('Información de la base de datos:', dbInfo);
+        } else {
+          forceLog('No se pudo conectar a la base de datos');
         }
       } catch (error) {
-        console.error(`[DB-CHECK] Error getting DB info: ${error.message}`);
+        forceLog(`Error obteniendo información de DB: ${error.message}`);
         dbInfo = { error: error.message };
       }
 
       const responseTime = Date.now() - startTime;
+      forceLog(`Tiempo de respuesta: ${responseTime}ms`);
 
-      return {
+      const response = {
         status: connectionResult.connected ? 'success' : 'error',
         message: connectionResult.connected
           ? 'Database connection successful'
@@ -134,12 +183,13 @@ export class AppController {
           ...connectionResult,
           responseTimeMs: responseTime,
           host: dbHost,
+          protocol: dbProtocol,
           dbInfo,
         },
         environment: {
-          nodeEnv: process.env.NODE_ENV,
-          vercelEnv: process.env.VERCEL_ENV,
-          vercelRegion: process.env.VERCEL_REGION,
+          nodeEnv: process.env.NODE_ENV || 'development',
+          vercelEnv: process.env.VERCEL_ENV || 'unknown',
+          vercelRegion: process.env.VERCEL_REGION || 'unknown',
         },
         request: {
           timestamp: new Date().toISOString(),
@@ -153,21 +203,30 @@ export class AppController {
               'Si el problema persiste, considera usar el URL de conexión directa de Supabase o un pooler',
             ],
       };
-    } catch (error) {
-      console.error(`[DB-CHECK] Unexpected error: ${error.message}`);
 
-      return {
+      forceLog('=== DIAGNÓSTICO COMPLETO ===');
+      forceLog('Enviando respuesta:', response);
+
+      return response;
+    } catch (error) {
+      forceLog(`Error inesperado: ${error.message}`);
+      forceLog(`Stack trace: ${error.stack}`);
+
+      const response = {
         status: 'error',
         message: `Unexpected error during database diagnostics: ${error.message}`,
         error: error.message,
         timestamp: new Date().toISOString(),
         responseTimeMs: Date.now() - startTime,
         environment: {
-          nodeEnv: process.env.NODE_ENV,
-          vercelEnv: process.env.VERCEL_ENV,
-          vercelRegion: process.env.VERCEL_REGION,
+          nodeEnv: process.env.NODE_ENV || 'development',
+          vercelEnv: process.env.VERCEL_ENV || 'unknown',
+          vercelRegion: process.env.VERCEL_REGION || 'unknown',
         },
       };
+
+      forceLog('Enviando respuesta de error:', response);
+      return response;
     }
   }
 }

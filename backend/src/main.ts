@@ -5,24 +5,43 @@ import { CORS } from './constants';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 
+// Logging mejorado para Vercel
 const logger = new Logger('Main');
+
+// Función para imprimir un mensaje que seguro aparece en los logs de Vercel
+function forceLog(message: string, obj?: any) {
+  // Log normal de NestJS
+  logger.log(message);
+
+  // Log directo a la consola (aparecerá en Vercel)
+  if (obj) {
+    console.log(`[VERCEL-LOG] ${message}`, JSON.stringify(obj));
+  } else {
+    console.log(`[VERCEL-LOG] ${message}`);
+  }
+}
 
 // Para entornos serverless, es útil guardar y reutilizar la instancia
 let app;
 
 async function bootstrap() {
   try {
+    // Forzar logs visibles al inicio
+    forceLog('=== APLICACIÓN INICIANDO ===');
+    forceLog(`Entorno: ${process.env.NODE_ENV}`);
+    forceLog(`Database URL configurada: ${!!process.env.DATABASE_URL}`);
+
     // Si ya tenemos una instancia de la aplicación, la reutilizamos
     if (app) {
-      logger.log('Reusing existing application instance');
+      forceLog('Reutilizando instancia existente de la aplicación');
       return app;
     }
 
-    logger.log('Creating new application instance');
+    forceLog('Creando nueva instancia de la aplicación');
 
     // Añadir timeout más largo para evitar problemas de conexión
     app = await NestFactory.create(AppModule, {
-      logger: ['log', 'error', 'warn', 'debug', 'verbose'],
+      logger: ['error', 'warn', 'log', 'debug', 'verbose'],
       // En producción, no falla si hay problemas con otros servicios
       abortOnError: process.env.NODE_ENV !== 'production',
     });
@@ -65,10 +84,10 @@ async function bootstrap() {
       next();
     });
 
-    // Middleware para capturar errores
+    // Middleware para capturar errores y garantizar que los logs se muestren
     app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-      logger.error(`Error handling request: ${error.message}`);
-      logger.error(error.stack);
+      forceLog(`Error handling request: ${error.message}`);
+      forceLog(`Stack trace: ${error.stack}`);
 
       if (!res.headersSent) {
         res.status(500).json({
@@ -86,30 +105,37 @@ async function bootstrap() {
     if (process.env.NODE_ENV !== 'production') {
       const port = process.env.PORT || 8080;
       await app.listen(port);
-      logger.log(`Server is running on port ${port}`);
-      logger.log(`Swagger is running on http://localhost:${port}/api/docs`);
+      forceLog(`Server is running on port ${port}`);
+      forceLog(`Swagger is running on http://localhost:${port}/api/docs`);
     } else {
       await app.init();
-      logger.log('Application initialized in serverless environment');
+      forceLog('Application initialized in serverless environment');
     }
 
     return app;
   } catch (error) {
-    logger.error(`Failed to start application: ${error.message}`);
-    logger.error(error.stack);
+    forceLog(`Failed to start application: ${error.message}`);
+    forceLog(`Stack trace: ${error.stack}`);
 
     // En producción, tenemos que continuar incluso con errores
     // porque Vercel espera que el handler exporte una aplicación
     if (process.env.NODE_ENV === 'production') {
-      logger.warn('CRITICAL WARNING: Application running in degraded mode');
+      forceLog('CRITICAL WARNING: Application running in degraded mode');
 
       // Vercel necesita alguna respuesta, así que creamos una mini app de Express
       if (!app) {
         const express = require('express');
         const expressApp = express();
 
+        // Middleware para loggear todas las solicitudes
+        expressApp.use((req, res, next) => {
+          forceLog(`Request received: ${req.method} ${req.url}`);
+          next();
+        });
+
         // Respuesta básica para todas las rutas
         expressApp.all('*', (req, res) => {
+          forceLog(`Responding with error for: ${req.method} ${req.url}`);
           res.status(500).json({
             error: 'Application failed to initialize properly',
             message:
@@ -135,11 +161,16 @@ export default bootstrap;
 // Handler específico para Vercel
 export const handler = async (req, res) => {
   try {
+    forceLog(`Vercel handler invoked: ${req.method} ${req.url}`);
+
     const server = await bootstrap();
     const expressInstance = server.getHttpAdapter().getInstance();
+
+    // Importante: este return devuelve una promesa que Vercel esperará
     return expressInstance(req, res);
   } catch (error) {
-    logger.error(`Handler error: ${error.message}`);
+    forceLog(`Handler error: ${error.message}`);
+    forceLog(`Stack trace: ${error.stack}`);
 
     // Si todo falla, al menos devolvemos una respuesta al cliente
     if (!res.headersSent) {
