@@ -2,7 +2,7 @@ import axios from "axios";
 
 const BACKEND_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "https://letspet-server.vercel.app/api";
+  "https://lets-pet-backend.vercel.app/api";
 
 const api = axios.create({
   baseURL: BACKEND_URL,
