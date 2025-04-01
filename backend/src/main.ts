@@ -1,56 +1,38 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { CORS } from './constants';
-import { ValidationPipe, Logger } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-
-// Logging mejorado para Vercel
-const logger = new Logger('Main');
-
-// Función para imprimir un mensaje que seguro aparece en los logs de Vercel
-function forceLog(message: string, obj?: any) {
-  // Log normal de NestJS
-  logger.log(message);
-
-  // Log directo a la consola (aparecerá en Vercel)
-  if (obj) {
-    console.log(`[VERCEL-LOG] ${message}`, JSON.stringify(obj));
-  } else {
-    console.log(`[VERCEL-LOG] ${message}`);
-  }
-}
 
 // Para entornos serverless, es útil guardar y reutilizar la instancia
 let app;
 
 async function bootstrap() {
   try {
-    // Forzar logs visibles al inicio
-    forceLog('=== APLICACIÓN INICIANDO ===');
-    forceLog(`Entorno: ${process.env.NODE_ENV}`);
-    forceLog(`Database URL configurada: ${!!process.env.DATABASE_URL}`);
+    // Log directo para Vercel
+    console.log('[VERCEL] Iniciando aplicación');
+    console.log(`[VERCEL] Entorno: ${process.env.NODE_ENV}`);
+    console.log(
+      `[VERCEL] DATABASE_URL configurado: ${!!process.env.DATABASE_URL}`,
+    );
 
     // Si ya tenemos una instancia de la aplicación, la reutilizamos
     if (app) {
-      forceLog('Reutilizando instancia existente de la aplicación');
+      console.log('[VERCEL] Reutilizando instancia existente');
       return app;
     }
 
-    forceLog('Creando nueva instancia de la aplicación');
+    console.log('[VERCEL] Creando nueva instancia');
 
-    // Añadir timeout más largo para evitar problemas de conexión
+    // Crear aplicación NestJS
     app = await NestFactory.create(AppModule, {
-      logger: ['error', 'warn', 'log', 'debug', 'verbose'],
-      // En producción, no falla si hay problemas con otros servicios
-      abortOnError: process.env.NODE_ENV !== 'production',
+      logger: ['error', 'warn', 'log'],
     });
 
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
         transform: true,
-        forbidNonWhitelisted: false,
       }),
     );
 
@@ -61,85 +43,69 @@ async function bootstrap() {
       credentials: true,
     });
 
-    // Configuramos el prefijo global
+    // Configurar prefijo global
     app.setGlobalPrefix('api', {
-      exclude: ['/', 'docs', 'health'],
+      exclude: ['/', 'health', 'docs'],
     });
 
     // Configuración de Swagger
     const config = new DocumentBuilder()
       .setTitle("Let's Pet API")
-      .setDescription("API para la aplicación Let's Pet Services")
+      .setDescription("API para la aplicación Let's Pet")
       .setVersion('1.0.0')
       .addBearerAuth()
       .build();
 
     const document = SwaggerModule.createDocument(app, config);
-    // Usamos una ruta más específica para la documentación
     SwaggerModule.setup('api/docs', app, document);
 
-    // Middleware para marcar la ruta de Swagger como pública
-    app.use('/api/docs', (req: Request, res: Response, next: NextFunction) => {
-      req['isPublic'] = true;
-      next();
-    });
-
-    // Middleware para capturar errores y garantizar que los logs se muestren
+    // Middleware para capturar errores
     app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-      forceLog(`Error handling request: ${error.message}`);
-      forceLog(`Stack trace: ${error.stack}`);
+      console.error(`[VERCEL-ERROR] ${error.message}`);
+      console.error(`[VERCEL-ERROR] ${error.stack}`);
 
       if (!res.headersSent) {
         res.status(500).json({
           statusCode: 500,
           message: 'Internal server error',
-          error:
-            process.env.NODE_ENV !== 'production' ? error.message : undefined,
         });
       } else {
         next(error);
       }
     });
 
-    // Solo en entorno de desarrollo, necesitamos escuchar en un puerto
+    // Solo en desarrollo necesitamos escuchar en un puerto
     if (process.env.NODE_ENV !== 'production') {
       const port = process.env.PORT || 8080;
       await app.listen(port);
-      forceLog(`Server is running on port ${port}`);
-      forceLog(`Swagger is running on http://localhost:${port}/api/docs`);
+      console.log(`[VERCEL] Server running on port ${port}`);
     } else {
       await app.init();
-      forceLog('Application initialized in serverless environment');
+      console.log('[VERCEL] Application initialized in serverless mode');
     }
 
     return app;
   } catch (error) {
-    forceLog(`Failed to start application: ${error.message}`);
-    forceLog(`Stack trace: ${error.stack}`);
+    console.error(`[VERCEL-ERROR] Failed to start: ${error.message}`);
+    console.error(`[VERCEL-ERROR] ${error.stack}`);
 
-    // En producción, tenemos que continuar incluso con errores
-    // porque Vercel espera que el handler exporte una aplicación
+    // En producción, continuamos aunque haya un error
     if (process.env.NODE_ENV === 'production') {
-      forceLog('CRITICAL WARNING: Application running in degraded mode');
+      console.warn('[VERCEL-ERROR] Running in degraded mode');
 
-      // Vercel necesita alguna respuesta, así que creamos una mini app de Express
+      // Si no tenemos app, crear una mínima con Express
       if (!app) {
         const express = require('express');
         const expressApp = express();
 
-        // Middleware para loggear todas las solicitudes
         expressApp.use((req, res, next) => {
-          forceLog(`Request received: ${req.method} ${req.url}`);
+          console.log(`[VERCEL] Request: ${req.method} ${req.url}`);
           next();
         });
 
-        // Respuesta básica para todas las rutas
         expressApp.all('*', (req, res) => {
-          forceLog(`Responding with error for: ${req.method} ${req.url}`);
           res.status(500).json({
             error: 'Application failed to initialize properly',
-            message:
-              'The server is currently unavailable. Please try again later.',
             timestamp: new Date().toISOString(),
           });
         });
@@ -150,31 +116,25 @@ async function bootstrap() {
       return app;
     }
 
-    // En desarrollo, queremos que falle para poder arreglarlo
+    // En desarrollo, queremos que falle para arreglarlo
     throw error;
   }
 }
 
-// Para entornos serverless (Vercel), exportamos el handler
+// Handler para Vercel Functions
 module.exports = async (req, res) => {
-  try {
-    forceLog(`Vercel handler invoked: ${req.method} ${req.url}`);
+  console.log(`[VERCEL] Handler invocado: ${req.method} ${req.url}`);
 
+  try {
     const server = await bootstrap();
     const expressInstance = server.getHttpAdapter().getInstance();
-
-    // Importante: este return devuelve una promesa que Vercel esperará
     return expressInstance(req, res);
   } catch (error) {
-    forceLog(`Handler error: ${error.message}`);
-    forceLog(`Stack trace: ${error.stack}`);
+    console.error(`[VERCEL-ERROR] Handler error: ${error.message}`);
 
-    // Si todo falla, al menos devolvemos una respuesta al cliente
     if (!res.headersSent) {
       res.status(500).json({
         error: 'Internal Server Error',
-        message:
-          'The server encountered an unexpected condition that prevented it from fulfilling the request.',
         timestamp: new Date().toISOString(),
       });
     }
