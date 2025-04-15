@@ -27,7 +27,7 @@ export default function Signup() {
   const methods = useForm({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
       lastName: "",
       email: "",
       password: "",
@@ -96,7 +96,7 @@ export default function Signup() {
                 </FormLabel>
                 <Controller
                   control={control}
-                  name="name"
+                  name="firstName"
                   render={({ field }) => (
                     <input
                       {...field}
@@ -104,10 +104,10 @@ export default function Signup() {
                     />
                   )}
                 />
-                {errors.name ? (
+                {errors.firstName ? (
                   <span className="text-red-500 text-sm">
                     {" "}
-                    {errors.name.message}{" "}
+                    {errors.firstName.message}{" "}
                   </span>
                 ) : (
                   <span className="text-sm invisible"> Espacio reservado </span>
