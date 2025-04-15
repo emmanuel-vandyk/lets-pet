@@ -1,8 +1,11 @@
 import { NestFactory } from '@nestjs/core';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import * as morgan from 'morgan';
-import { CORS } from './constants';
-import { env } from 'process';
+import { ValidationPipe } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+
+// Para entornos serverless, es útil guardar y reutilizar la instancia
+let app;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

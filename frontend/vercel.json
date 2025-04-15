@@ -1,0 +1,8 @@
+{
+  "rewrites": [{ "source": "/", "destination": "/home/landing" }],
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "env": {
+    "NEXT_PUBLIC_BACKEND_URL": "https://lets-pet-backend.vercel.app/api"
+  }
+}

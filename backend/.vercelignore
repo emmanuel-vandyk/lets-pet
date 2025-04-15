@@ -1,0 +1,23 @@
+# Archivos grandes o innecesarios
+node_modules
+.git
+.gitignore
+.DS_Store
+test
+npm-debug.log
+README.md
+
+# Archivos sensibles
+*.log
+.env.local
+
+# Excluir archivos específicos
+coverage
+.env*
+!.env.example
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.idea
+.vscode
+*.tsbuildinfo 

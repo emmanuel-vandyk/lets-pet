@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation"
 
-
 export default function Page() {
-  return (
-    redirect("home/landing")
-  );
-}
+    return (
+      redirect("/home")
+    )
+  }
+  

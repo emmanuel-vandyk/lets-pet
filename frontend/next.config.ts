@@ -4,7 +4,15 @@ const nextConfig: NextConfig = {
   /* config options here */
   trailingSlash: false,
   images: {
-    unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lets-pet-backend.vercel.app",
+        port: "",
+        pathname: "/**",
+      },
+    ],
+    unoptimized: process.env.NODE_ENV === "development",
   },
 };
 
