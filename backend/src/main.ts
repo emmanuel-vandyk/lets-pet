@@ -38,7 +38,7 @@ async function bootstrap() {
 
     // Configurar CORS
     app.enableCors({
-      origin: '*',
+      origin: ['http://localhost:3000', 'https://lets-pet.vercel.app'],
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
       credentials: true,
     });
