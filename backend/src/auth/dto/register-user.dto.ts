@@ -34,7 +34,7 @@ export class RegisterUserDto {
   password: string;
 
   @IsString()
-  passwordConfirmation: string;
+  confirmPassword: string;
 
   @IsBoolean({ message: 'You must agree to the terms and conditions' })
   terms: boolean;

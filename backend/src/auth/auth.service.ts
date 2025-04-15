@@ -132,7 +132,7 @@ export class AuthService {
   }
 
   private validatePasswords(registerUserDto: RegisterUserDto): void {
-    if (registerUserDto.password !== registerUserDto.passwordConfirmation) {
+    if (registerUserDto.password !== registerUserDto.confirmPassword) {
       throw new BadRequestException(AuthErrors.PASSWORD_MISMATCH);
     }
   }
