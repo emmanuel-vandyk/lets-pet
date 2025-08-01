@@ -1,8 +1,9 @@
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 
 export const CORS: CorsOptions = {
-  origin: true,
-  methods: 'GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS',
+  origin: ['http://localhost:3000', 'https://lets-pet.vercel.app'],
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
   credentials: true,
-  allowedHeaders: 'Content-Type, Accept, Authorization',
+  allowedHeaders: ['Content-Type', 'Accept', 'Authorization', 'Origin', 'X-Requested-With'],
+  optionsSuccessStatus: 200,
 };

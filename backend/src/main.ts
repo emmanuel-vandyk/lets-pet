@@ -3,6 +3,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
+import { CORS } from './constants';
 
 // Para entornos serverless, es útil guardar y reutilizar la instancia
 let app;
@@ -37,11 +38,7 @@ async function bootstrap() {
     );
 
     // Configurar CORS
-    app.enableCors({
-      origin: ['http://localhost:3000', 'https://lets-pet.vercel.app'],
-      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-      credentials: true,
-    });
+    app.enableCors(CORS);
 
     // Configurar prefijo global
     app.setGlobalPrefix('api', {
@@ -97,6 +94,29 @@ async function bootstrap() {
       if (!app) {
         const express = require('express');
         const expressApp = express();
+
+        // CORS para Express fallback
+        expressApp.use((req, res, next) => {
+          const origin = req.headers.origin;
+          const allowedOrigins = [
+            'http://localhost:3000',  
+            'https://lets-pet.vercel.app'
+          ];
+          
+          if (allowedOrigins.includes(origin)) {
+            res.setHeader('Access-Control-Allow-Origin', origin);
+          }
+          
+          res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+          res.setHeader('Access-Control-Allow-Headers', 'Origin,X-Requested-With,Content-Type,Accept,Authorization');
+          res.setHeader('Access-Control-Allow-Credentials', 'true');
+          
+          if (req.method === 'OPTIONS') {
+            res.sendStatus(200);
+          } else {
+            next();
+          }
+        });
 
         expressApp.use((req, res, next) => {
           console.log(`[VERCEL] Request: ${req.method} ${req.url}`);

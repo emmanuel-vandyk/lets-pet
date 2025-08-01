@@ -10,11 +10,45 @@ datasource db {
 }
 
 model User {
-  id        String  @id @default(uuid())
-  firstName String
-  lastName  String
-  email     String  @unique
-  password  String
-  hashedRt  String?
-  terms     Boolean @default(false)
+  id            String          @id @default(uuid())
+  firstName     String
+  lastName      String
+  email         String          @unique
+  password      String
+  hashedRt      String?
+  terms         Boolean         @default(false)
+  address       String?
+  phone         String?
+  profilePic    String?
+  createdAt     DateTime?       @default(now())
+  updatedAt     DateTime?
+  PaymentMethod PaymentMethod[]
+  Pet           Pet[]
+}
+
+model PaymentMethod {
+  id            Int      @id @default(autoincrement())
+  type          String
+  name          String
+  last4         String?
+  accountNumber String?
+  userId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime
+  User          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Pet {
+  id          Int      @id @default(autoincrement())
+  name        String
+  species     String?
+  breed       String?
+  age         Int?
+  weight      Float?
+  image       String?
+  description String?
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+  User        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
