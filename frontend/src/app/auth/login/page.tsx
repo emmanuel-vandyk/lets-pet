@@ -61,7 +61,8 @@ export default function Login(): JSX.Element {
           <Image
             src={dog}
             alt='Lets Pet'
-            width={250}
+            width={300}
+            height={300}
           />
         </div>
         <article className='flex flex-col w-full col-span-3'>
@@ -69,59 +70,90 @@ export default function Login(): JSX.Element {
             <Link href={'/'} passHref>
               <ArrowIcon />
             </Link>
-            <h1 className='w-96 text-h1-semibold text-center font-extrabold whitespace-break-spaces'>Iniciar sesión</h1>
+            <h1 className='w-48 text-h1-semibold text-center font-extrabold whitespace-break-spaces'>Iniciar sesión</h1>
           </div>
           <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(handleFormSubmit)} className='flex flex-col w-fit justify-start items-center gap-7 bg-default pt-4 h-[26rem] rounded-xl mt-4 '>
-              <FormItem className='px-10 mt-4'>
-                <FormLabel className='text-lg  after:content-["*"] after:ml-0.5 after:text-red-500'> Email </FormLabel>
-                <Controller
-                  control={control}
-                  name='email'
-                  render={({ field }) => <input {...field} className='flex items-start w-96 shadow-md p-1 outline-none' />}
-                />
-                {errors.email ? (
-                  <span className='text-red-500 text-sm'> {errors.email.message} </span>
-                ) : (
-                  <span className='text-sm invisible'> Espacio reservado </span>
-                )}
-              </FormItem>
-              <FormItem className='px-10'>
-                <FormLabel className='text-lg after:content-["*"] after:ml-0.5 after:text-red-500'> Contraseña </FormLabel>
-                <div className='relative'>
+            <form
+              onSubmit={handleSubmit(handleFormSubmit)}
+              className='flex flex-col w-fit justify-start items-center gap-10 bg-default pt-4 h-[32rem] md:h-[36rem] rounded-xl mt-4'
+            >
+              <FormItem className='px-10 mt-6 w-full max-w-[420px]'>
+                <FormLabel className='text-xl after:content-["*"] after:ml-0.5 after:text-red-500'>
+                  Email
+                </FormLabel>
+                <div className="relative">
                   <Controller
                     control={control}
-                    name='password'
-                    render={({ field }) => <input {...field} className='flex items-start w-96 shadow-md p-1 outline-none'
-                      type={showPassword ? 'text' : 'password'}
-                    />}
+                    name='email'
+                    render={({ field }) => (
+                      <input
+                        {...field}
+                        className='flex items-start w-full max-w-[420px] h-12 shadow-md p-3 outline-none text-lg rounded-md'
+                      />
+                    )}
                   />
                   <button
                     type='button'
                     onClick={togglePasswordVisibility}
-                    className='absolute -translate-y-6 right-2 bg-transparent'
+                    className='absolute right-4 -translate-y-9 bg-transparent'
                   >
-                    {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                    {showPassword ? <Eye size={24} /> : <EyeOff size={24} />}
                   </button>
-                  {errors.password ? (
-                    <span className='text-red-500 text-sm'> {errors.password.message} </span>
+                  {errors.email ? (
+                    <span className='text-red-500 text-base'> {errors.email.message} </span>
                   ) : (
-                    <span className='text-sm invisible'> Espacio reservado </span>
+                    <span className='text-base invisible'> Espacio reservado </span>
                   )}
-                  <Link href={'/auth/reset-password'} passHref>
-                    <p className='text-fondodark font-semibold text-md place-self-end mt-2'>¿Olvidaste tu contraseña?</p>
-                  </Link>
-
                 </div>
               </FormItem>
-              <Button className='bg-accent text-white font-bold text-lg sm:text-md rounded-md w-full max-w-96 py-6 md:py-5'
-                type='submit'
-                disabled={isSubmitting || mutation.isPending} // Deshabilita el botón mientras carga
-              >
-                {mutation.isPending ? 'Cargando...' : 'Iniciar sesión'}
-              </Button>
+              <FormItem className='px-10 w-full max-w-[420px]'>
+                <FormLabel className='text-xl after:content-["*"] after:ml-0.5 after:text-red-500'>
+                  Contraseña
+                </FormLabel>
+                <div className='relative'>
+                  <Controller
+                    control={control}
+                    name='password'
+                    render={({ field }) => (
+                      <input
+                        {...field}
+                        className='flex items-start w-full max-w-[420px] h-12 shadow-md p-3 outline-none text-lg rounded-md'
+                        type={showPassword ? 'text' : 'password'}
+                      />
+                    )}
+                  />
+                  <button
+                    type='button'
+                    onClick={togglePasswordVisibility}
+                    className='absolute right-4 -translate-y-9 bg-transparent'
+                  >
+                    {showPassword ? <Eye size={24} /> : <EyeOff size={24} />}
+                  </button>
+                  {errors.password ? (
+                    <span className='text-red-500 text-base'> {errors.password.message} </span>
+                  ) : (
+                    <span className='text-base invisible'> Espacio reservado </span>
+                  )}
+                  <Link href={'/auth/reset-password'} passHref>
+                    <p className='text-fondodark font-semibold text-md place-self-end mt-3'>
+                      ¿Olvidaste tu contraseña?
+                    </p>
+                  </Link>
+                </div>
+              </FormItem>
+              <div className="px-10 w-full max-w-[420px]">
+                <Button
+                  className='bg-accent text-white font-bold text-xl sm:text-lg rounded-md w-full py-6'
+                  type='submit'
+                  disabled={isSubmitting || mutation.isPending}
+                >
+                  {mutation.isPending ? 'Cargando...' : 'Iniciar sesión'}
+                </Button>
+              </div>
               <Link href={'/auth/signup'} passHref>
-                <span className='text-fondodark font-semibold text-md'>¿No tienes cuenta? Regístrate aquí</span>
+                <span className='text-fondodark font-semibold text-lg'>
+                  ¿No tienes cuenta? Regístrate aquí
+                </span>
               </Link>
             </form>
           </FormProvider>

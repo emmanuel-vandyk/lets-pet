@@ -74,8 +74,8 @@ export default function Signup() {
 
   return (
     <>
-      <section className="grid grid-flow-col w-full lg:justify-around items-center justify-center max-h-screen">
-        <article className="grid w-full ">
+      <section className="flex w-1/2 justify-center items-center max-h-screen mx-auto">
+        <article className="flex flex-col place-items-end">
           <div className="flex w-full">
             <Link href={"/"} passHref>
               <ArrowIcon />
@@ -87,9 +87,9 @@ export default function Signup() {
           <FormProvider {...methods}>
             <form
               onSubmit={handleSubmit(handleFormSubmit)}
-              className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 lg:place-items-center w-fit gap-2 bg-default pt-4 pb-8 my-4 rounded-xl"
+              className="gap-2 bg-default pt-6 pb-10 my-4 rounded-xl w-[420px] md:w-[500px] mx-auto"
             >
-              <FormItem className="px-10 md:mt-3">
+              <FormItem className="px-14 md:mt-4 w-full">
                 <FormLabel className='text-lg after:content-["*"] after:ml-0.5 after:text-red-500'>
                   {" "}
                   Nombre{" "}
@@ -100,7 +100,7 @@ export default function Signup() {
                   render={({ field }) => (
                     <input
                       {...field}
-                      className="flex items-center shadow-md p-1 outline-none"
+                      className="flex items-center shadow-md p-2 outline-none w-full text-base"
                     />
                   )}
                 />
@@ -113,7 +113,7 @@ export default function Signup() {
                   <span className="text-sm invisible"> Espacio reservado </span>
                 )}
               </FormItem>
-              <FormItem className="px-10 md:mt-3">
+              <FormItem className="px-14 md:mt-4 w-full">
                 <FormLabel className='text-lg after:content-["*"] after:ml-0.5 after:text-red-500'>
                   {" "}
                   Apellido{" "}
@@ -124,7 +124,7 @@ export default function Signup() {
                   render={({ field }) => (
                     <input
                       {...field}
-                      className="flex items-start shadow-md p-1 outline-none"
+                      className="flex items-start shadow-md p-2 outline-none w-full text-base"
                     />
                   )}
                 />
@@ -137,7 +137,7 @@ export default function Signup() {
                   <span className="text-sm invisible"> Espacio reservado </span>
                 )}
               </FormItem>
-              <FormItem className="px-10">
+              <FormItem className="px-14 w-full">
                 <FormLabel className='text-lg after:content-["*"] after:ml-0.5 after:text-red-500'>
                   {" "}
                   Email{" "}
@@ -148,7 +148,7 @@ export default function Signup() {
                   render={({ field }) => (
                     <input
                       {...field}
-                      className="flex items-center shadow-md p-1 outline-none"
+                      className="flex items-center shadow-md p-2 outline-none w-full text-base"
                     />
                   )}
                 />
@@ -161,7 +161,7 @@ export default function Signup() {
                   <span className="text-sm invisible"> Espacio reservado </span>
                 )}
               </FormItem>
-              <FormItem className="px-10">
+              <FormItem className="px-14 w-full">
                 <FormLabel className='text-lg after:content-["*"] after:ml-0.5 after:text-red-500'>
                   {" "}
                   Contraseña{" "}
@@ -173,7 +173,7 @@ export default function Signup() {
                     render={({ field }) => (
                       <input
                         {...field}
-                        className="flex items-start shadow-md p-1 outline-none"
+                        className="flex items-start shadow-md p-2 outline-none w-full text-base"
                         type={showPassword ? "text" : "password"}
                       />
                     )}
@@ -181,7 +181,7 @@ export default function Signup() {
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
-                    className="absolute -translate-y-6 right-2 bg-transparent"
+                    className="absolute -translate-y-7 right-2 bg-transparent"
                   >
                     {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
                   </button>
@@ -198,7 +198,7 @@ export default function Signup() {
                   )}
                 </div>
               </FormItem>
-              <FormItem className="px-10">
+              <FormItem className="px-14 w-full">
                 <FormLabel className='text-lg after:content-["*"] after:ml-0.5 after:text-red-500'>
                   {" "}
                   Confirmar contraseña{" "}
@@ -210,7 +210,7 @@ export default function Signup() {
                     render={({ field }) => (
                       <input
                         {...field}
-                        className="flex items-start shadow-md p-1 outline-none"
+                        className="flex items-start shadow-md p-2 outline-none w-full text-base"
                         type={showPassword ? "text" : "password"}
                       />
                     )}
@@ -218,7 +218,7 @@ export default function Signup() {
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
-                    className="absolute -translate-y-6 right-2 bg-transparent"
+                    className="absolute -translate-y-7 right-2 bg-transparent"
                   >
                     {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
                   </button>
@@ -235,8 +235,8 @@ export default function Signup() {
                   )}
                 </div>
               </FormItem>
-              <FormItem className='text-lg after:content-["*"] after:ml-0.5 after:text-red-500'>
-                <article className="flex flex-col md:justify-evenly items-start col-span-1 mx-10">
+              <FormItem className='text-lg after:content-["*"] after:ml-0.5 after:text-red-500 w-full'>
+                <article className="flex flex-col md:justify-evenly items-start col-span-1 mx-14 w-full">
                   <Controller
                     control={control}
                     name="terms"
@@ -272,18 +272,20 @@ export default function Signup() {
                   )}
                 </article>
               </FormItem>
-              <Button
-                type="submit"
-                disabled={isSubmitting || mutation.isPending} // Deshabilita el botón mientras carga
-                className="lg:col-span-2 place-self-stretch 2xl:col-span-3 bg-accent text-white font-bold text-lg sm:text-md rounded-md py-6 md:py-5 mx-10 lg:mx-10"
-              >
-                {mutation.isPending ? "Cargando..." : "Registrarse"}
-              </Button>
+              <div className="flex justify-center w-full">
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || mutation.isPending}
+                  className="w-full bg-accent text-white font-bold text-lg sm:text-md rounded-md py-6 md:py-5 mx-14"
+                >
+                  {mutation.isPending ? "Cargando..." : "Registrarse"}
+                </Button>
+              </div>
             </form>
           </FormProvider>
         </article>
         <div className="hidden md:grid place-self-end place-items-center place-content-end w-4/6">
-          <Image src={cat} alt="Lets Pet" />
+          <Image src={cat} alt="Lets Pet" width={365} height={365} />
         </div>
       </section>
     </>

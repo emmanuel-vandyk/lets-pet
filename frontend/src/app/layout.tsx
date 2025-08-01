@@ -38,7 +38,7 @@ export default function RootLayout({
             {/* Si la ruta es privada visualizar este Navbar */}
             {/* <NavigationMenuDashboard /> */}
           </header>
-          <main className='w-full background-image bg-cover bg-center'>
+          <main className='w-full background-image bg-cover bg-center min-h-screen'>
             <div className="flex justify-evenly mx-auto px-4 py-8">
                 {children}
             </div>
@@ -50,6 +50,7 @@ export default function RootLayout({
                   src={iconHeader}
                   alt="Lets Pet"
                   width={65}
+                  height={65}
                 />
                 <h2 className="text-h2-bold z-10 text-fondodark whitespace-nowrap">Lets Pet!</h2>
               </div>
