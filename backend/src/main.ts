@@ -37,9 +37,9 @@ async function bootstrap() {
       }),
     );
 
+
     // Configurar CORS
     app.enableCors(CORS);
-
     // Configurar prefijo global
     app.setGlobalPrefix('api', {
       exclude: ['/', 'health', 'docs'],
